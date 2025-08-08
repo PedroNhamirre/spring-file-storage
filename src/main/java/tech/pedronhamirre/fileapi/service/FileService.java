@@ -179,6 +179,7 @@ public class FileService {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/files/")
                 .path(id.toString())
+                .path("/download")
                 .toUriString();
     }
 
