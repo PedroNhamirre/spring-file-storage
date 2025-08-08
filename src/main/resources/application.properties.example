@@ -3,6 +3,7 @@ spring.application.name=file-api
 
 # Diretório para upload de arquivos (relativo ao projeto)
 file.upload-dir=uploads
+server.port=${PORT:8080}
 
 # Configurações do banco de dados PostgreSQL (exemplo)
 spring.datasource.url=jdbc:postgresql://localhost:5432/filedb
