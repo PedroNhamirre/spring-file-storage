@@ -18,7 +18,7 @@ API para upload, listagem e download de arquivos (imagens PNG, JPEG, GIF e PDFs)
 1. Clone o repositório
 
 ```bash
-git clone <url-do-repo>
+git clone https://github.com/PedroNhamirre/spring-file-storage.git
 cd file-api
 ```
 
