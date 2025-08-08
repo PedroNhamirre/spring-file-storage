@@ -1,33 +1,74 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# =================
+# Build directories
+# =================
+/target/
+/build/
 
-### STS ###
-.apt_generated
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# ===================
+# IDEs and editors
+# ===================
+# Spring Tool Suite (STS)
+.apt_generated/
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
-.sts4-cache
+.sts4-cache/
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
+
+# VS Code
+.vscode/
+
+# ============================
+# Exclude uploads directory and temp files
+# ============================
+/uploads/
+/uploads/**
+
+# Spring Boot specific
+/logs/
+/spring.log
+*.log
+
+# ============================
+# Exclude local config files (optional)
+/ ============================
+# application.properties pode conter dados sensíveis (ex: credenciais),
+# então é comum criar um application.properties.example e ignorar o real.
+/application.properties
+/application.yml
+
+# ============================
+# Include specific targets in source folders (exceptions)
+# ============================
+!**/src/main/**/target/
+!**/src/test/**/target/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# =================
+# OS generated files
+# =================
+.DS_Store
+Thumbs.db
+
+# =================
+# Misc
+# =================
+HELP.md
