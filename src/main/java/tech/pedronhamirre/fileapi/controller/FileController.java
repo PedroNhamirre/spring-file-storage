@@ -1,6 +1,7 @@
 package tech.pedronhamirre.fileapi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -48,7 +49,7 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(file.length())
-                .body(new InputStreamResource(Files.newInputStream(file.toPath())));
+                .body(new FileSystemResource(file));
     }
 
 }
