@@ -28,7 +28,7 @@ public class FileService {
     private final FileUploadRepository fileUploadRepository;
     private final Path storageDir;
 
-    private final long MAX_SIZE  ;
+    private final long MAX_SIZE;
 
     @Autowired
     public FileService(FileUploadRepository fileUploadRepository,
@@ -68,15 +68,7 @@ public class FileService {
                     .storagePath(storagePath.toString())
                     .build();
             fileUploadRepository.save(fileEntity);
-            String url = buildFileUrl(fileEntity.getId());
-            return new FileUploadResponse(
-                    fileEntity.getOriginalName(),
-                    formatSizeInMB(fileEntity.getSize()),
-                    fileEntity.getContentType(),
-                    "." + fileEntity.getExtension(),
-                    url,
-                    fileEntity.getUploadTime()
-            );
+            return mapToFileUploadResponse(fileEntity);
         } catch (IOException e) {
             throw new FileStorageException("Erro ao salvar o arquivo", e);
         }
@@ -84,15 +76,7 @@ public class FileService {
 
     public FileUploadResponse getFileData(UUID id) {
         FileEntity fileEntity = findFileById(id);
-        String url = buildFileUrl(fileEntity.getId());
-        return new FileUploadResponse(
-                fileEntity.getOriginalName(),
-                formatSizeInMB(fileEntity.getSize()),
-                fileEntity.getContentType(),
-                "." + fileEntity.getExtension(),
-                url,
-                fileEntity.getUploadTime()
-        );
+        return mapToFileUploadResponse(fileEntity);
     }
 
     public File getDownloadFile(UUID id) {
@@ -163,6 +147,7 @@ public class FileService {
     private FileUploadResponse mapToFileUploadResponse(FileEntity fileEntity) {
         String url = buildFileUrl(fileEntity.getId());
         return new FileUploadResponse(
+                fileEntity.getId(),
                 fileEntity.getOriginalName(),
                 formatSizeInMB(fileEntity.getSize()),
                 fileEntity.getContentType(),
