@@ -2,8 +2,6 @@ package tech.pedronhamirre.fileapi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +14,10 @@ import tech.pedronhamirre.fileapi.exceptions.files.FileStorageException;
 import tech.pedronhamirre.fileapi.model.FileEntity;
 import tech.pedronhamirre.fileapi.repository.FileUploadRepository;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.*;
-import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -27,10 +25,6 @@ public class FileService {
 
     private final FileUploadRepository fileUploadRepository;
     private final Path storageDir;
-
-    private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
-            "image/png", "image/jpeg", "image/gif", "application/pdf"
-    );
 
     private final long MAX_SIZE  ;
 
@@ -41,8 +35,6 @@ public class FileService {
         this.fileUploadRepository = fileUploadRepository;
         this.storageDir = Path.of(uploadDir).toAbsolutePath().normalize();
         this.MAX_SIZE = DataSize.parse(maxFileSize).toBytes();
-
-
         try {
             Files.createDirectories(storageDir);
         } catch (IOException e) {
@@ -52,19 +44,19 @@ public class FileService {
 
     public FileUploadResponse upload(FileUploadRequest fileUploadRequest) {
         MultipartFile file = fileUploadRequest.file();
-
         validateFile(file);
-
         String originalName = file.getOriginalFilename();
         String extension = getExtension(originalName);
         String contentType = file.getContentType();
         String storedName = generateStoredFileName(extension);
-
         Path storagePath = storageDir.resolve(storedName);
+
+        if (!Objects.equals(storagePath.getParent(), storageDir)) {
+            throw new FileStorageException("Nome de ficheiro não suportado");
+        }
 
         try {
             Files.copy(file.getInputStream(), storagePath, StandardCopyOption.REPLACE_EXISTING);
-
             FileEntity fileEntity = FileEntity.builder()
                     .originalName(originalName)
                     .storedName(storedName)
@@ -73,12 +65,8 @@ public class FileService {
                     .extension(extension)
                     .storagePath(storagePath.toString())
                     .build();
-
             fileUploadRepository.save(fileEntity);
-
             String url = buildFileUrl(fileEntity.getId());
-
-
             return new FileUploadResponse(
                     fileEntity.getOriginalName(),
                     formatSizeInMB(fileEntity.getSize()),
@@ -87,7 +75,6 @@ public class FileService {
                     url,
                     fileEntity.getUploadTime()
             );
-
         } catch (IOException e) {
             throw new FileStorageException("Erro ao salvar o arquivo", e);
         }
@@ -95,9 +82,7 @@ public class FileService {
 
     public FileUploadResponse getFileData(UUID id) {
         FileEntity fileEntity = findFileById(id);
-
         String url = buildFileUrl(fileEntity.getId());
-
         return new FileUploadResponse(
                 fileEntity.getOriginalName(),
                 formatSizeInMB(fileEntity.getSize()),
@@ -108,35 +93,20 @@ public class FileService {
         );
     }
 
+    public File getDownloadFile(UUID id) {
+        Path filePath = getFilePath(id);
+        return filePath.toFile();
+    }
+
     public Path getFilePath(UUID id) {
         FileEntity fileEntity = findFileById(id);
-
         Path filePath = Path.of(fileEntity.getStoragePath());
         if (!Files.exists(filePath)) {
             throw new FileNotFoundException("Arquivo não encontrado no armazenamento");
         }
-
         return filePath;
     }
 
-    public Resource loadAsResource(UUID id) {
-        try {
-            Path filePath = getFilePath(id);
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new FileNotFoundException("Arquivo não está disponível para leitura");
-            }
-
-            return resource;
-        } catch (MalformedURLException e) {
-            throw new FileStorageException("Erro ao carregar arquivo como recurso", e);
-        }
-    }
-
-    public String getContentType(UUID id) {
-        return findFileById(id).getContentType();
-    }
 
     private FileEntity findFileById(UUID id) {
         return fileUploadRepository.findById(id)
@@ -147,14 +117,8 @@ public class FileService {
         if (file.isEmpty()) {
             throw new FileStorageException("Arquivo está vazio");
         }
-
         if (file.getSize() > MAX_SIZE) {
             throw new FileSizeLimitExceededException("Tamanho máximo permitido é " + formatSizeInMB(MAX_SIZE));
-        }
-
-        String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
-            throw new FileStorageException("Tipo de arquivo não suportado: " + contentType);
         }
     }
 

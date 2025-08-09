@@ -10,6 +10,7 @@ import tech.pedronhamirre.fileapi.exceptions.files.FileSizeLimitExceededExceptio
 import tech.pedronhamirre.fileapi.exceptions.files.FileStorageException;
 import tech.pedronhamirre.fileapi.exceptions.files.InvalidFileTypeException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
