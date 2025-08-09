@@ -1,6 +1,6 @@
 # File API
 
-API para upload, listagem e download de arquivos (imagens PNG, JPEG, GIF e PDFs) com Spring Boot.
+API para upload, listagem e download de arquivos (imagens PNG, JPEG, GIF, PDFs, videos ...) com Spring Boot.
 
 ---
 
@@ -113,7 +113,7 @@ Faz download do arquivo.
 
 ## Observações
 
-* Tamanho máximo do arquivo: 50MB
+* Tamanho máximo do arquivo: 20MB
 * Arquivos são salvos localmente na pasta configurada em `file.upload-dir`.
 
 ---
