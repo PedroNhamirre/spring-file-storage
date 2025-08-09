@@ -17,8 +17,10 @@ import tech.pedronhamirre.fileapi.repository.FileUploadRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -98,6 +100,12 @@ public class FileService {
         return filePath.toFile();
     }
 
+    public List<FileUploadResponse> getAllFiles() {
+        return fileUploadRepository.findAll().stream()
+                .map(this::mapToFileUploadResponse)
+                .collect(Collectors.toList());
+    }
+
     public Path getFilePath(UUID id) {
         FileEntity fileEntity = findFileById(id);
         Path filePath = Path.of(fileEntity.getStoragePath());
@@ -152,4 +160,15 @@ public class FileService {
         return String.format("%.1f MB", sizeInMB);
     }
 
+    private FileUploadResponse mapToFileUploadResponse(FileEntity fileEntity) {
+        String url = buildFileUrl(fileEntity.getId());
+        return new FileUploadResponse(
+                fileEntity.getOriginalName(),
+                formatSizeInMB(fileEntity.getSize()),
+                fileEntity.getContentType(),
+                "." + fileEntity.getExtension(),
+                url,
+                fileEntity.getUploadTime()
+        );
+    }
 }
