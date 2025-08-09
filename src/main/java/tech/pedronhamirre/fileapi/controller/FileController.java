@@ -51,5 +51,4 @@ public class FileController {
                 .body(new InputStreamResource(Files.newInputStream(file.toPath())));
     }
 
-
 }
