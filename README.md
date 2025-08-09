@@ -113,8 +113,7 @@ Faz download do arquivo.
 
 ## Observações
 
-* Tamanho máximo do arquivo: 10MB
-* Tipos aceitos: PNG, JPEG, GIF, PDF
+* Tamanho máximo do arquivo: 50MB
 * Arquivos são salvos localmente na pasta configurada em `file.upload-dir`.
 
 ---
